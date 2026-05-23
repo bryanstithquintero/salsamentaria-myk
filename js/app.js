@@ -13,6 +13,10 @@ const Auth = (function () {
   }
 
   function requireAuth() {
+    if (!getUser()) {
+      window.location.href = './index.html';
+      return false;
+    }
     return true;
   }
 
@@ -22,7 +26,7 @@ const Auth = (function () {
 
   function logout() {
     sessionStorage.removeItem(KEY);
-    window.location.href = './dashboard.html';
+    window.location.href = './index.html';
   }
 
   return { getUser, requireAuth, login, logout };

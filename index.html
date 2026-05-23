@@ -99,8 +99,10 @@
 
 <script src="./js/data.js"></script>
 <script>
-  // Redirigir siempre al dashboard
-  window.location.href = './dashboard.html';
+  // Si ya hay sesión activa, ir directo al dashboard
+  if (sessionStorage.getItem('myk_session')) {
+    window.location.href = './dashboard.html';
+  }
 
   function doLogin() {
     const usr = document.getElementById('usr').value.trim();
