@@ -113,7 +113,7 @@ Los datos se almacenan en `localStorage` bajo las claves `myk_productos` y `myk_
 No requiere instalación ni servidor. Basta con clonar el repositorio y abrir `index.html` en el navegador:
 
 ```bash
-git clone https://github.com/TU-USUARIO/salsamentaria-myk.git
+git clone https://github.com/bryanstithquintero/salsamentaria-myk.git
 cd salsamentaria-myk
 ```
 
@@ -127,7 +127,7 @@ Luego abre `index.html` directamente en tu navegador, o usa la extensión **Live
 2. Ve a **Settings → Pages**.
 3. En **Source**, selecciona branch `main` y carpeta `/ (root)`.
 4. Guarda y espera 1-2 minutos.
-5. Tu sitio estará disponible en `https://TU-USUARIO.github.io/salsamentaria-myk/`.
+5. Tu sitio estará disponible en `https://bryanstithquintero.github.io/salsamentaria-myk/dashboard.html`.
 
 ---
 
@@ -140,12 +140,6 @@ Luego abre `index.html` directamente en tu navegador, o usa la extensión **Live
 
 ---
 
-## Capturas de pantalla
-
-> Agrega aquí imágenes del sistema una vez desplegado.
-
----
-
 ## Autor
 
-Desarrollado por **Bryan** como proyecto universitario — Universidad Iberoamericana, 2025.
+Desarrollado por **Bryan Quintero** como proyecto universitario — Universidad Iberoamericana, 2026.
