@@ -1,7 +1,7 @@
 /**
  * dashboard.js — Lógica del panel principal
  */
-const YT_VIDEO_ID = 'VIDEO_ID_AQUI'; 
+const YT_VIDEO_ID = 'y98yumliemM'; 
 
 // ── Instancia del gráfico ────────────────────────────────────────────────
 let salesChart = null;
