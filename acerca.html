@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Acerca del sistema — Salsamentaria MYK</title>
+  <link rel="stylesheet" href="./css/main.css">
+</head>
+<body>
+<div id="app">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <div class="main">
+    <div class="page">
+
+      <!-- Hero -->
+      <div class="about-hero">
+        <div class="about-hero-text">
+          <h2>Sistema de gestión<br><em>Salsamentaria MYK</em></h2>
+          <p>
+            Plataforma web para el control de ventas, inventario y productos de la
+            Salsamentaria MYK, ubicada en Neiva, Huila, Colombia. Desarrollada con
+            tecnologías web estándar: HTML5, CSS3 y JavaScript puro.
+          </p>
+        </div>
+        <div>
+          <div class="about-hero-mark">MYK</div>
+          <div class="about-hero-version">v 1.0.0 · 2026</div>
+        </div>
+      </div>
+
+      <!-- Grid 2 columnas -->
+      <div class="grid-2 mb-24">
+
+        <!-- Funcionalidades -->
+        <div class="about-card">
+          <h3>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            Funcionalidades implementadas
+          </h3>
+          <p>El sistema cuenta con los siguientes módulos activos:</p>
+          <ul>
+            <li><strong>Dashboard</strong> — Resumen diario con estadísticas en tiempo real, gráfico de ventas y alertas de bajo stock.</li>
+            <li><strong>Gestión de productos</strong> — Catálogo con control de inventario, búsqueda, filtros por categoría y exportación a CSV.</li>
+            <li><strong>Formulario de producto</strong> — Creación y edición de productos con cálculo automático de margen de ganancia.</li>
+            <li><strong>Historial de ventas</strong> — Registro completo de transacciones con filtros por estado y cliente.</li>
+            <li><strong>Registro de ventas</strong> — Modal para registrar ventas rápidas directamente desde el historial.</li>
+          </ul>
+          <div class="about-banner">
+            <strong>Próximamente:</strong> Módulos de Clientes, Proveedores, Realizar venta y Reportes están planificados para la siguiente versión.
+          </div>
+        </div>
+
+        <!-- Guía de uso -->
+        <div class="about-card">
+          <h3>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+            Guía rápida de uso
+          </h3>
+          <p>Sigue estos pasos para comenzar a gestionar el negocio:</p>
+          <ol>
+            <li>Ingresa a la página principal e inicia sesión con las credenciales de administrador.</li>
+            <li>Revisa el <strong>Dashboard</strong> para ver el resumen del día: ventas, stock y alertas.</li>
+            <li>Consulta la sección <strong>Bajo stock</strong> en el dashboard y verifica qué productos necesitan reposición.</li>
+            <li>Agrega o actualiza productos desde <strong>Productos → + Nuevo producto</strong>.</li>
+            <li>Registra ventas manualmente desde <strong>Historial → + Registrar venta</strong>.</li>
+            <li>Usa los filtros del historial para analizar el comportamiento de ventas por período y cliente.</li>
+            <li>Exporta el inventario en CSV desde la página de Productos para respaldo o análisis externo.</li>
+          </ol>
+        </div>
+
+      </div>
+
+      <!-- Grid 2 columnas - segunda fila -->
+      <div class="grid-2 mb-24">
+
+        <!-- Tecnologías -->
+        <div class="about-card">
+          <h3>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            Tecnologías utilizadas
+          </h3>
+          <p>El proyecto usa únicamente tecnologías web nativas, sin dependencias externas pesadas:</p>
+          <div style="margin-top:8px">
+            <div class="tech-row"><span class="tech-label">Lenguajes</span><span><strong>HTML5</strong>, CSS3, JavaScript ES6+</span></div>
+            <div class="tech-row"><span class="tech-label">Diseño</span><span>CSS personalizado con variables y Grid/Flexbox</span></div>
+            <div class="tech-row"><span class="tech-label">Tipografía</span><span>Cormorant Garamond + DM Sans (Google Fonts)</span></div>
+            <div class="tech-row"><span class="tech-label">Gráficos</span><span>Chart.js 4.4 (CDN, MIT License)</span></div>
+            <div class="tech-row"><span class="tech-label">Persistencia</span><span>localStorage y sessionStorage del navegador</span></div>
+            <div class="tech-row"><span class="tech-label">Hosting</span><span>GitHub Pages (gratuito, dominio .github.io)</span></div>
+            <div class="tech-row"><span class="tech-label">Editor</span><span>Visual Studio Code</span></div>
+            <div class="tech-row"><span class="tech-label">Control de versiones</span><span>Git + GitHub</span></div>
+          </div>
+        </div>
+
+        <!-- Categorías de productos -->
+        <div class="about-card">
+          <h3>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><polyline points="16 3 12 7 8 3"/></svg>
+            Categorías de productos
+          </h3>
+          <p>La Salsamentaria MYK maneja tres líneas de producto:</p>
+          <ul>
+            <li>
+              <strong>🥩 Cárnicos</strong> — Chorizos, salchichas, salchichones y longanizas artesanales
+              elaborados con carne de res y cerdo de origen regional. Se empacan al vacío para
+              garantizar frescura.
+            </li>
+            <li>
+              <strong>🧀 Lácteos</strong> — Quesos frescos, doble crema, mozzarella, yogures y
+              mantequilla provenientes de hatos del departamento del Huila. Elaborados sin
+              conservantes artificiales.
+            </li>
+            <li>
+              <strong>📦 Otros</strong> — Productos complementarios como chicharrón prensado y
+              snacks derivados. Amplía la oferta para clientes mayoristas.
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- Glosario de términos técnicos -->
+      <div class="panel mb-24">
+        <div class="panel-header">
+          <span class="panel-title">Glosario de términos técnicos</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Término</th>
+                <th>Definición</th>
+                <th>Ejemplo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong><abbr title="Stock Keeping Unit">SKU</abbr></strong></td>
+                <td>Código único que identifica cada producto en el inventario. Permite rastrear existencias y referencias rápidamente.</td>
+                <td class="td-code">CHO-001</td>
+              </tr>
+              <tr>
+                <td><strong>Stock mínimo</strong></td>
+                <td>Cantidad mínima de unidades permitida antes de generar una alerta de reposición. Evita quiebres de inventario.</td>
+                <td>5 und</td>
+              </tr>
+              <tr>
+                <td><strong>Margen de ganancia</strong></td>
+                <td>Porcentaje de utilidad sobre el precio de compra. Se usa para calcular automáticamente el precio de venta sugerido.</td>
+                <td>35% → compra $4.200, venta $5.670</td>
+              </tr>
+              <tr>
+                <td><strong><abbr title="Ticket promedio">Ticket promedio</abbr></strong></td>
+                <td>Valor promedio de cada transacción de venta en un período determinado. Indicador clave de rendimiento.</td>
+                <td>$ 33.945 por venta</td>
+              </tr>
+              <tr>
+                <td><strong>Bajo stock</strong></td>
+                <td>Estado de un producto cuando sus existencias actuales son iguales o menores al stock mínimo configurado.</td>
+                <td>3 und (mín. 5)</td>
+              </tr>
+              <tr>
+                <td><strong>Presentación</strong></td>
+                <td>Formato o empaque en que se vende el producto al cliente final (paquete, libra, botella, etc.).</td>
+                <td>Paquete x 500 g</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Info del negocio -->
+      <div class="panel">
+        <div class="panel-header"><span class="panel-title">Información del proyecto</span></div>
+        <div class="panel-body">
+          <div class="grid-3" style="gap:24px">
+            <div>
+              <div style="font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);font-weight:600;margin-bottom:8px">Negocio</div>
+              <p style="font-size:13px">Salsamentaria MYK<br>Neiva, Huila, Colombia<br>Mercado artesanal local</p>
+            </div>
+            <div>
+              <div style="font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);font-weight:600;margin-bottom:8px">Estructura del proyecto</div>
+              <ul style="font-size:13px;padding-left:16px">
+                <li><code>index.html</code> — Login</li>
+                <li><code>dashboard.html</code> — Panel principal</li>
+                <li><code>productos.html</code> — Inventario</li>
+                <li><code>nuevo-producto.html</code> — Formulario</li>
+                <li><code>historial.html</code> — Ventas</li>
+                <li><code>css/main.css</code> — Estilos</li>
+                <li><code>js/</code> — Lógica por página</li>
+              </ul>
+            </div>
+            <div>
+              <div style="font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);font-weight:600;margin-bottom:8px">Actividad académica</div>
+              <p style="font-size:13px;line-height:1.65">Proyecto desarrollado para la Actividad 4 del módulo de Desarrollo Web. Diseño y programación del prototipo elaborado en actividades anteriores.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="./js/data.js"></script>
+<script src="./js/app.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    if (!Auth.requireAuth()) return;
+    renderSidebar('acerca');
+  });
+</script>
+</body>
+</html>

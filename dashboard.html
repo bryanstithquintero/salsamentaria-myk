@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — Salsamentaria MYK</title>
+  <link rel="stylesheet" href="./css/main.css">
+  <!-- Chart.js para el gráfico de ventas -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<div id="app">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <div class="main">
+    <div class="page">
+      <!-- Cabecera -->
+      <div class="page-header">
+        <div class="page-title-wrap">
+          <h1 class="page-title">Dashboard</h1>
+          <p class="page-subtitle" id="dash-date">Cargando…</p>
+        </div>
+        <div class="page-actions">
+          <div class="search-box">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" placeholder="Buscar producto, cliente, venta…" id="dash-search" oninput="globalSearch(this.value)">
+          </div>
+          <button class="btn btn-outline btn-sm">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Exportar
+          </button>
+          <a href="./historial.html" class="btn btn-primary btn-sm">+ Nueva venta</a>
+        </div>
+      </div>
+
+      <!-- Tarjetas de estadísticas -->
+      <div class="stats-grid mb-24">
+        <div class="stat-card">
+          <div class="stat-label">Ventas hoy</div>
+          <div class="stat-value" id="stat-ventas">—</div>
+          <div class="stat-meta up">↑ 12% vs. ayer</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Productos en stock</div>
+          <div class="stat-value" id="stat-stock">—</div>
+          <div class="stat-meta" id="stat-refs">de — referencias</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Bajo stock</div>
+          <div class="stat-value" id="stat-bajo" style="color:var(--err)">—</div>
+          <div class="stat-meta down">requieren reposición</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Clientes activos</div>
+          <div class="stat-value">128</div>
+          <div class="stat-meta up">↑ 4 esta semana</div>
+        </div>
+      </div>
+
+      <!-- Gráfico + Bajo stock -->
+      <div class="grid-2-1 mb-24">
+        <!-- Gráfico de ventas -->
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title">Ventas de los últimos 7 días</span>
+            <div class="chart-tabs">
+              <button class="chart-tab active" data-period="7d" onclick="setChartPeriod('7d',this)">7d</button>
+              <button class="chart-tab" data-period="30d" onclick="setChartPeriod('30d',this)">30d</button>
+              <button class="chart-tab" data-period="90d" onclick="setChartPeriod('90d',this)">90d</button>
+            </div>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="salesChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Productos con bajo stock -->
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title">Bajo stock</span>
+            <span class="badge badge-err" id="low-count">— ítems</span>
+          </div>
+          <div class="panel-body" id="low-stock-list">
+            <!-- Generado por JS -->
+          </div>
+          <div class="panel-footer" style="padding-top:10px;padding-bottom:12px">
+            <a href="./productos.html" style="font-size:12px">Ver todos los productos →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ventas recientes -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Ventas recientes</span>
+          <a href="./historial.html" style="font-size:12.5px">Ver historial completo →</a>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Fecha</th>
+                <th>Cliente</th>
+                <th>Productos</th>
+                <th class="text-right">Cant.</th>
+                <th class="text-right">Total</th>
+              </tr>
+            </thead>
+            <tbody id="recent-sales"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Sección YouTube / Demo del proyecto -->
+      <div class="yt-section">
+        <div class="yt-header">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FF0000" stroke-width="2"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.97C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#FF0000" stroke="none"/></svg>
+          <span class="panel-title">Demostración del proyecto</span>
+          <span class="yt-tag">VIDEO</span>
+        </div>
+        <div class="yt-body">
+          <div class="yt-frame" id="yt-frame">
+            <!--
+              INSTRUCCIÓN: Reemplaza VIDEO_ID_AQUI con el ID de tu video de YouTube.
+              El ID es la parte después de ?v= en la URL.
+              Ejemplo: https://www.youtube.com/watch?v=dQw4w9WgXcQ → ID = dQw4w9WgXcQ
+            -->
+            <div class="yt-placeholder-box" id="yt-placeholder" onclick="loadYTVideo()">
+              <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="1.5"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.97C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="rgba(255,255,255,0.3)" stroke="none"/></svg>
+              <p>Haz clic aquí para ver el video de demostración</p>
+            </div>
+          </div>
+          <div class="yt-info">
+            <h4>Sistema de gestión MYK — Demostración completa</h4>
+            <p>En este video se muestra el proceso de creación del sitio web, la estructura del código HTML, CSS y JavaScript, y las funcionalidades implementadas para la Salsamentaria MYK, Neiva - Huila.</p>
+            <div class="yt-topics">
+              <h5>Contenido del video</h5>
+              <ul>
+                <li>Estructura del proyecto y archivos</li>
+                <li>Sistema de autenticación (login)</li>
+                <li>Dashboard con estadísticas en tiempo real</li>
+                <li>Gestión de productos e inventario</li>
+                <li>Historial de ventas con filtros</li>
+                <li>Despliegue en GitHub Pages</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="./js/data.js"></script>
+<script src="./js/app.js"></script>
+<script src="./js/dashboard.js"></script>
+</body>
+</html>

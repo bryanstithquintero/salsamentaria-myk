@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Iniciar sesión — Salsamentaria MYK</title>
+  <link rel="stylesheet" href="./css/main.css">
+</head>
+<body>
+<h2 class="sr-only">Salsamentaria MYK — Pantalla de inicio de sesión</h2>
+
+<div class="login-page">
+
+  <!-- Columna izquierda: marca + visual -->
+  <div class="login-left">
+    <div class="login-brand">
+      <div class="login-brand-icon">M</div>
+      <div>
+        <div class="login-brand-name">Salsamentaria<br>MYK</div>
+        <div class="login-brand-sub">Neiva · Huila</div>
+      </div>
+    </div>
+
+    <!-- Mosaico visual de productos -->
+    <div class="login-visual">
+      <div class="product-mosaic">
+        <div class="mosaic-cell">
+          <span class="emoji">🥩</span>
+          <span class="mname">Cárnicos</span>
+        </div>
+        <div class="mosaic-cell">
+          <span class="emoji">🧀</span>
+          <span class="mname">Quesos</span>
+        </div>
+        <div class="mosaic-cell">
+          <span class="emoji">🥛</span>
+          <span class="mname">Lácteos</span>
+        </div>
+        <div class="mosaic-cell">
+          <span class="emoji">🌿</span>
+          <span class="mname">Artesanal</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tagline -->
+    <div class="login-tagline">
+      <h1>Control de ventas<br>e inventario,<br><em>hecho simple.</em></h1>
+      <p>Sistema diseñado para la gestión diaria de la Salsamentaria MYK.</p>
+    </div>
+  </div>
+
+  <!-- Columna derecha: formulario -->
+  <div class="login-right">
+    <div class="login-form">
+      <h2>Iniciar sesión</h2>
+      <p class="login-subtitle">Ingresa con tu cuenta para administrar el negocio.</p>
+
+      <div class="login-error" id="login-error">
+        Usuario o contraseña incorrectos. Inténtalo de nuevo.
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="usr">Usuario o correo</label>
+        <input class="form-input" id="usr" type="text"
+          placeholder="usuario@salsamentariamyk.com" autocomplete="username">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="pwd">Contraseña</label>
+        <input class="form-input" id="pwd" type="password"
+          placeholder="••••••••••" autocomplete="current-password">
+        <p class="form-hint">Mínimo 8 caracteres.</p>
+      </div>
+
+      <div class="login-opts">
+        <label class="check-label">
+          <input type="checkbox" id="remember"> Recordarme en este equipo
+        </label>
+        <a href="#" style="font-size:13px">¿Olvidaste tu contraseña?</a>
+      </div>
+
+      <button class="btn btn-primary btn-lg btn-block" id="login-btn" onclick="doLogin()">
+        Iniciar sesión →
+      </button>
+
+      <p class="login-footer">
+        ¿No tienes cuenta? <a href="#">Solicítala al administrador</a>
+      </p>
+
+      <!-- Credenciales de demo -->
+      <div style="margin-top:2rem;padding:14px 16px;background:var(--bg);border:1px solid var(--bdr);border-radius:var(--r);font-size:12px;color:var(--text-muted)">
+        <strong style="color:var(--text-2);display:block;margin-bottom:5px">Demo — credenciales de prueba</strong>
+        Usuario: <code style="font-size:12px">admin</code> &nbsp;·&nbsp; Contraseña: <code style="font-size:12px">admin123</code>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="./js/data.js"></script>
+<script>
+  // Redirigir siempre al dashboard
+  window.location.href = './dashboard.html';
+
+  function doLogin() {
+    const usr = document.getElementById('usr').value.trim();
+    const pwd = document.getElementById('pwd').value;
+    const err = document.getElementById('login-error');
+    const btn = document.getElementById('login-btn');
+
+    err.style.display = 'none';
+    btn.textContent = 'Ingresando…';
+    btn.disabled = true;
+
+    // Credenciales válidas (demo)
+    const VALID = [
+      { usr: 'admin',                      pwd: 'admin123', name: 'Bryan Q.',       role: 'Administrador' },
+      { usr: 'usuario@salsamentariamyk.com', pwd: 'admin123', name: 'Bryan Q.',      role: 'Administrador' },
+    ];
+
+    setTimeout(() => {
+      const match = VALID.find(v => v.usr === usr && v.pwd === pwd);
+      if (match) {
+        sessionStorage.setItem('myk_session', JSON.stringify({ name: match.name, role: match.role, ts: Date.now() }));
+        window.location.href = './dashboard.html';
+      } else {
+        err.style.display = 'block';
+        btn.textContent = 'Iniciar sesión →';
+        btn.disabled = false;
+        document.getElementById('pwd').value = '';
+        document.getElementById('pwd').focus();
+      }
+    }, 500);
+  }
+
+  // Enter en el campo de contraseña
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('pwd').addEventListener('keydown', e => {
+      if (e.key === 'Enter') doLogin();
+    });
+    document.getElementById('usr').addEventListener('keydown', e => {
+      if (e.key === 'Enter') document.getElementById('pwd').focus();
+    });
+  });
+</script>
+</body>
+</html>
