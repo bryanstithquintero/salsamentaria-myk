@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nuevo producto — Salsamentaria MYK</title>
+  <link rel="stylesheet" href="./css/main.css">
+</head>
+<body>
+<div id="app">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <div class="main">
+    <div class="page">
+
+      <!-- Breadcrumb + cabecera -->
+      <div class="breadcrumb">
+        <a href="./productos.html">Productos</a>
+        <span>›</span>
+        <span id="bc-label">Nuevo producto</span>
+      </div>
+
+      <div class="page-header" style="margin-bottom:20px">
+        <div class="page-title-wrap">
+          <h1 class="page-title" id="form-title">Nuevo producto</h1>
+          <p class="page-subtitle">Completa los campos. Los marcados con * son obligatorios.</p>
+        </div>
+        <div class="page-actions">
+          <a href="./productos.html" class="btn btn-outline">Cancelar</a>
+          <button class="btn btn-primary" id="save-btn" onclick="saveProduct()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            Guardar producto
+          </button>
+        </div>
+      </div>
+
+      <!-- Formulario -->
+      <div class="form-wrap">
+
+        <!-- SECCIÓN 1: Información básica -->
+        <div class="form-section">
+          <div class="fs-info">
+            <h3>Información básica</h3>
+            <p>Nombre visible en el catálogo y código interno para identificación en inventario.</p>
+            <ul>
+              <li>Usa un nombre claro y descriptivo</li>
+              <li>El <abbr title="Stock Keeping Unit: identificador único del producto en el inventario">SKU</abbr> debe ser único</li>
+              <li>Selecciona la categoría correcta</li>
+            </ul>
+          </div>
+          <div>
+            <div class="form-group">
+              <label class="form-label" for="f-name">Nombre del producto *</label>
+              <input class="form-input" id="f-name" type="text" placeholder="Ej: Chorizo Santarrosano" required>
+            </div>
+            <div class="form-row form-row-2">
+              <div class="form-group">
+                <label class="form-label" for="f-code">
+                  Código / <abbr title="Stock Keeping Unit: código único que identifica el producto en el sistema">SKU</abbr> *
+                </label>
+                <input class="form-input" id="f-code" type="text" placeholder="Ej: CHO-001" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="f-cat">Categoría *</label>
+                <select class="form-select" id="f-cat">
+                  <option value="">— Selecciona —</option>
+                  <option value="Cárnicos">🥩 Cárnicos</option>
+                  <option value="Lácteos">🧀 Lácteos</option>
+                  <option value="Otros">📦 Otros</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 2: Presentación -->
+        <div class="form-section">
+          <div class="fs-info">
+            <h3>Presentación</h3>
+            <p>Define el empaque, peso o unidad en que se vende el producto al cliente.</p>
+          </div>
+          <div>
+            <div class="form-row form-row-2">
+              <div class="form-group">
+                <label class="form-label" for="f-pres">Presentación *</label>
+                <input class="form-input" id="f-pres" type="text" placeholder="Ej: Paquete x 500 g">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="f-unit">Unidad de medida</label>
+                <select class="form-select" id="f-unit">
+                  <option value="paquete">Paquete</option>
+                  <option value="libra">Libra</option>
+                  <option value="kilogramo">Kilogramo</option>
+                  <option value="botella">Botella</option>
+                  <option value="unidad">Unidad</option>
+                  <option value="250 g">250 g</option>
+                  <option value="500 g">500 g</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 3: Inventario -->
+        <div class="form-section">
+          <div class="fs-info">
+            <h3>Inventario</h3>
+            <p>Cantidad actual en bodega y umbral de alerta para reposición.</p>
+            <ul>
+              <li>
+                <abbr title="Cuando las existencias caen por debajo de este número, el sistema activa una alerta de reposición">Stock mínimo</abbr>:
+                cantidad mínima antes de alertar
+              </li>
+              <li>El proveedor es opcional</li>
+            </ul>
+          </div>
+          <div>
+            <div class="form-row form-row-3">
+              <div class="form-group">
+                <label class="form-label" for="f-stock">Existencias actuales *</label>
+                <input class="form-input" id="f-stock" type="number" placeholder="0" min="0" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="f-min">
+                  <abbr title="Alerta cuando el stock baje de esta cantidad">Stock mínimo</abbr>
+                </label>
+                <input class="form-input" id="f-min" type="number" placeholder="5" min="0">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="f-prov">Proveedor</label>
+                <select class="form-select" id="f-prov">
+                  <option value="">— Sin proveedor —</option>
+                  <option value="Cárnicos del Huila S.A.">Cárnicos del Huila S.A.</option>
+                  <option value="Lácteos San Isidro">Lácteos San Isidro</option>
+                  <option value="Distribuidora MYK">Distribuidora MYK</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 4: Precios -->
+        <div class="form-section">
+          <div class="fs-info">
+            <h3>Precios</h3>
+            <p>
+              El precio de venta se calcula automáticamente según el
+              <abbr title="Porcentaje de ganancia sobre el precio de compra. Ejemplo: compra a $4.000, margen 35% → venta a $5.400">margen (%)</abbr>,
+              o ingrésalo manualmente.
+            </p>
+          </div>
+          <div>
+            <div class="form-row form-row-3">
+              <div class="form-group">
+                <label class="form-label" for="f-buy">Precio de compra * ($)</label>
+                <input class="form-input" id="f-buy" type="number" placeholder="4200" min="0" oninput="calcSellPrice()">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="f-margin">
+                  <abbr title="Margen de ganancia: porcentaje que se suma al precio de compra para obtener el precio de venta">Margen (%)</abbr>
+                </label>
+                <input class="form-input" id="f-margin" type="number" placeholder="35" min="0" max="100" oninput="calcSellPrice()">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="f-sell">Precio de venta * ($)</label>
+                <input class="form-input" id="f-sell" type="number" placeholder="5670" min="0">
+              </div>
+            </div>
+            <div id="margin-preview" style="display:none;font-size:12.5px;color:var(--ok);padding:6px 0">
+              ✓ Ganancia por unidad: <strong id="ganancia">—</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 5: Descripción -->
+        <div class="form-section">
+          <div class="fs-info">
+            <h3>Descripción</h3>
+            <p>Texto informativo que aparece en la ficha del producto. Opcional pero recomendado.</p>
+          </div>
+          <div>
+            <div class="form-group">
+              <textarea class="form-textarea" id="f-desc" rows="4"
+                placeholder="Ej: Chorizo artesanal de la región, empacado al vacío. Producto refrigerado. Sin conservantes artificiales."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Acciones finales -->
+        <div class="form-actions">
+          <a href="./productos.html" class="btn btn-outline">Cancelar</a>
+          <button class="btn btn-primary" onclick="saveProduct()">
+            Guardar producto
+          </button>
+        </div>
+
+      </div><!-- /form-wrap -->
+    </div>
+  </div>
+</div>
+
+<script src="./js/data.js"></script>
+<script src="./js/app.js"></script>
+<script src="./js/nuevo-producto.js"></script>
+</body>
+</html>

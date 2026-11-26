@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Historial de ventas — Salsamentaria MYK</title>
+  <link rel="stylesheet" href="./css/main.css">
+</head>
+<body>
+<div id="app">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <div class="main">
+    <div class="page">
+
+      <!-- Cabecera -->
+      <div class="page-header">
+        <div class="page-title-wrap">
+          <h1 class="page-title">Historial de ventas</h1>
+          <p class="page-subtitle" id="hist-subtitle">Cargando…</p>
+        </div>
+        <div class="page-actions">
+          <div class="search-box">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="hist-search" placeholder="Buscar por ID, cliente o producto…" oninput="applyFilters()">
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="exportPDF()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Exportar PDF
+          </button>
+          <button class="btn btn-primary btn-sm" onclick="showNewSaleModal()">+ Registrar venta</button>
+        </div>
+      </div>
+
+      <!-- Filtros -->
+      <div class="hist-filters">
+        <div class="hf-group">
+          <span class="hf-label">Rango:</span>
+          <select class="hf-select" id="filter-range" onchange="applyFilters()">
+            <option value="month">Mayo 2026</option>
+            <option value="week">Última semana</option>
+            <option value="all">Todo el historial</option>
+          </select>
+        </div>
+        <div class="hf-divider"></div>
+        <div class="hf-group">
+          <span class="hf-label">Cliente:</span>
+          <select class="hf-select" id="filter-client" onchange="applyFilters()">
+            <option value="">Todos</option>
+            <option>María L. Ortiz</option>
+            <option>Carlos Perdomo</option>
+            <option>Cliente eventual</option>
+            <option>Ana Sofía Rojas</option>
+            <option>Restaurante La Cava</option>
+            <option>Jorge E. Lozano</option>
+          </select>
+        </div>
+        <div class="hf-divider"></div>
+        <div class="hf-group">
+          <span class="hf-label">Estado:</span>
+          <div class="status-btns" id="status-btns">
+            <button class="st-btn active" data-st="all"       onclick="setStatus(this)">Todas</button>
+            <button class="st-btn"        data-st="pagada"    onclick="setStatus(this)">Pagadas</button>
+            <button class="st-btn"        data-st="pendiente" onclick="setStatus(this)">Pendientes</button>
+            <button class="st-btn"        data-st="anulada"   onclick="setStatus(this)">Anuladas</button>
+          </div>
+        </div>
+        <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="clearFilters()">
+          Limpiar filtros
+        </button>
+      </div>
+
+      <!-- Resumen estadístico -->
+      <div class="stats-grid mb-24" style="grid-template-columns:repeat(4,1fr)">
+        <div class="stat-card">
+          <div class="stat-label">Ventas en período</div>
+          <div class="stat-value" id="sum-count">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Monto total</div>
+          <div class="stat-value" id="sum-total" style="font-size:1.5rem">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">
+            <abbr title="Valor promedio por transacción de venta en el período filtrado">Ticket promedio</abbr>
+          </div>
+          <div class="stat-value" id="sum-avg" style="font-size:1.5rem">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Producto más vendido</div>
+          <div class="stat-value" id="sum-top" style="font-size:1.1rem;padding-top:4px">—</div>
+        </div>
+      </div>
+
+      <!-- Tabla de ventas -->
+      <div class="panel">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Fecha</th>
+                <th>Cliente</th>
+                <th>Productos</th>
+                <th class="text-center">Cant.</th>
+                <th class="text-right">Total</th>
+                <th>Estado</th>
+                <th style="width:44px"></th>
+              </tr>
+            </thead>
+            <tbody id="hist-tbody">
+              <!-- Generado por JS -->
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination">
+          <span class="pg-info" id="pg-info">—</span>
+          <div class="pg-btns" id="pg-btns"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Registrar venta rápida -->
+<div id="sale-modal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.45);align-items:center;justify-content:center">
+  <div style="background:var(--surface);border-radius:var(--rl);padding:28px;max-width:480px;width:95%;box-shadow:var(--shd)">
+    <h3 style="font-family:var(--fd);font-size:1.4rem;margin-bottom:4px">Registrar venta</h3>
+    <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px">Los campos con * son obligatorios.</p>
+    <div class="form-group">
+      <label class="form-label">Producto *</label>
+      <select class="form-select" id="ns-prod"></select>
+    </div>
+    <div class="form-row form-row-2">
+      <div class="form-group">
+        <label class="form-label">Cliente</label>
+        <input class="form-input" id="ns-client" type="text" placeholder="Cliente eventual">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Cantidad *</label>
+        <input class="form-input" id="ns-qty" type="number" placeholder="1" min="1" oninput="calcSaleTotal()">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Total ($)</label>
+      <input class="form-input" id="ns-total" type="number" placeholder="0">
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:8px">
+      <button class="btn btn-outline" onclick="closeSaleModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveSale()">Registrar venta</button>
+    </div>
+  </div>
+</div>
+
+<script src="./js/data.js"></script>
+<script src="./js/app.js"></script>
+<script src="./js/historial.js"></script>
+</body>
+</html>

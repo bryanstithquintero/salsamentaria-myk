@@ -1,0 +1,26 @@
+# Blueprint de Render para la API (backend).
+# La base de datos PostgreSQL se crea en Neon (plan gratuito, sin vencimiento)
+# y su cadena de conexión se pega en DATABASE_URL al crear el servicio.
+services:
+  - type: web
+    name: myk-api
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm ci --omit=dev
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: "22"
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 8h
+      - key: CORS_ORIGIN
+        value: https://bryanstithquintero.github.io,http://localhost:5173
+      - key: DATABASE_URL
+        sync: false
