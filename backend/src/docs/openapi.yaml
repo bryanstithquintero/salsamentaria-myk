@@ -1,0 +1,709 @@
+openapi: 3.0.3
+info:
+  title: API MYK – Control de Ventas e Inventario
+  version: 1.0.0
+  description: |
+    API REST de la Salsamentaria MYK (Neiva, Huila). Gestiona productos, inventario por lotes
+    con política FEFO, ventas de contado y a crédito, clientes, proveedores, reportes y auditoría.
+
+    **Autenticación:** use `POST /api/auth/login` (usuario `admin`, contraseña `admin123`),
+    copie el `token` y péguelo en el botón **Authorize**.
+
+    **Formato de error (todas las rutas):**
+    `{ "error": { "codigo": "VALIDACION", "mensaje": "…", "detalles": [ … ], "solicitud": "uuid" } }`
+  contact:
+    name: Bryan Stith Quintero Guacary
+    url: https://github.com/bryanstithquintero/salsamentaria-myk
+servers:
+  - url: /
+    description: Servidor actual
+tags:
+  - name: Autenticación
+  - name: Usuarios
+  - name: Catálogos
+  - name: Productos
+  - name: Inventario
+  - name: Ventas
+  - name: Clientes
+  - name: Panel
+  - name: Reportes
+  - name: Auditoría
+  - name: Sistema
+security:
+  - bearerAuth: []
+
+paths:
+  /api/health:
+    get:
+      tags: [Sistema]
+      summary: Estado de la API y de la base de datos
+      security: []
+      responses:
+        '200':
+          description: API operativa
+          content:
+            application/json:
+              example: { estado: ok, baseDeDatos: conectada, hora: '2026-11-26T15:00:00.000Z' }
+
+  /api/auth/login:
+    post:
+      tags: [Autenticación]
+      summary: Iniciar sesión y obtener un token JWT
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [usuario, contrasena]
+              properties:
+                usuario: { type: string, example: admin, description: Usuario o correo }
+                contrasena: { type: string, format: password, example: admin123 }
+      responses:
+        '200':
+          description: Sesión iniciada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token: { type: string }
+                  usuario: { $ref: '#/components/schemas/Usuario' }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '401':
+          description: Usuario o contraseña incorrectos
+          content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+        '429': { description: Demasiados intentos (límite de 20 cada 15 minutos) }
+
+  /api/auth/perfil:
+    get:
+      tags: [Autenticación]
+      summary: Datos del usuario autenticado
+      responses:
+        '200':
+          description: Perfil
+          content: { application/json: { schema: { $ref: '#/components/schemas/Usuario' } } }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+
+  /api/auth/contrasena:
+    put:
+      tags: [Autenticación]
+      summary: Cambiar la contraseña propia
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [actual, nueva]
+              properties:
+                actual: { type: string, format: password }
+                nueva: { type: string, format: password, minLength: 8 }
+      responses:
+        '204': { description: Contraseña actualizada }
+        '400': { $ref: '#/components/responses/Validacion' }
+
+  /api/usuarios:
+    get:
+      tags: [Usuarios]
+      summary: Listar usuarios (administrador)
+      responses:
+        '200':
+          description: Usuarios
+          content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Usuario' } } } }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+    post:
+      tags: [Usuarios]
+      summary: Crear usuario (administrador)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [nombre, usuario, rol, contrasena]
+              properties:
+                nombre: { type: string, example: Laura Méndez }
+                usuario: { type: string, example: lmendez }
+                correo: { type: string, format: email }
+                rol: { type: string, enum: [admin, vendedor] }
+                contrasena: { type: string, format: password, minLength: 8 }
+      responses:
+        '201':
+          description: Usuario creado
+          content: { application/json: { schema: { $ref: '#/components/schemas/Usuario' } } }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '409': { $ref: '#/components/responses/Conflicto' }
+
+  /api/usuarios/{id}:
+    put:
+      tags: [Usuarios]
+      summary: Editar usuario, cambiar rol o desactivar (administrador)
+      parameters: [{ $ref: '#/components/parameters/Id' }]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre: { type: string }
+                correo: { type: string, format: email }
+                rol: { type: string, enum: [admin, vendedor] }
+                activo: { type: boolean }
+      responses:
+        '200': { description: Usuario actualizado }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+        '422': { $ref: '#/components/responses/ReglaNegocio' }
+
+  /api/usuarios/{id}/contrasena:
+    patch:
+      tags: [Usuarios]
+      summary: Restablecer la contraseña de un usuario (administrador)
+      parameters: [{ $ref: '#/components/parameters/Id' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object, required: [contrasena], properties: { contrasena: { type: string, minLength: 8 } } }
+      responses:
+        '204': { description: Contraseña restablecida }
+
+  /api/categorias:
+    get:
+      tags: [Catálogos]
+      summary: Listar categorías con número de productos activos
+      responses:
+        '200':
+          description: Categorías
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties: { id: { type: integer }, nombre: { type: string }, icono: { type: string }, productos: { type: integer } }
+    post:
+      tags: [Catálogos]
+      summary: Crear categoría (administrador)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object, required: [nombre], properties: { nombre: { type: string }, icono: { type: string } } }
+      responses:
+        '201': { description: Categoría creada }
+
+  /api/proveedores:
+    get:
+      tags: [Catálogos]
+      summary: Listar proveedores
+      parameters:
+        - { name: buscar, in: query, schema: { type: string } }
+        - { $ref: '#/components/parameters/Pagina' }
+        - { $ref: '#/components/parameters/Limite' }
+      responses:
+        '200': { description: Página de proveedores }
+    post:
+      tags: [Catálogos]
+      summary: Crear proveedor (administrador)
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/ProveedorEntrada' } } }
+      responses:
+        '201': { description: Proveedor creado }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '409': { $ref: '#/components/responses/Conflicto' }
+
+  /api/proveedores/{id}:
+    get:
+      tags: [Catálogos]
+      summary: Detalle del proveedor con sus últimas entradas
+      parameters: [{ $ref: '#/components/parameters/Id' }]
+      responses:
+        '200': { description: Proveedor }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+    put:
+      tags: [Catálogos]
+      summary: Editar proveedor (administrador)
+      parameters: [{ $ref: '#/components/parameters/Id' }]
+      requestBody:
+        content: { application/json: { schema: { $ref: '#/components/schemas/ProveedorEntrada' } } }
+      responses:
+        '200': { description: Proveedor actualizado }
+
+  /api/productos:
+    get:
+      tags: [Productos]
+      summary: Listar productos con búsqueda, filtros, orden y paginación
+      parameters:
+        - { name: buscar, in: query, schema: { type: string }, description: Nombre o código }
+        - { name: categoria_id, in: query, schema: { type: integer } }
+        - { name: estado, in: query, schema: { type: string, enum: [bajo, ok] } }
+        - { name: orden, in: query, schema: { type: string, enum: [nombre, codigo, stock, precio, categoria] } }
+        - { name: dir, in: query, schema: { type: string, enum: [asc, desc] } }
+        - { $ref: '#/components/parameters/Pagina' }
+        - { $ref: '#/components/parameters/Limite' }
+      responses:
+        '200':
+          description: Página de productos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  datos: { type: array, items: { $ref: '#/components/schemas/Producto' } }
+                  meta: { $ref: '#/components/schemas/Meta' }
+    post:
+      tags: [Productos]
+      summary: Crear producto (administrador). Si no se envía precio_venta se calcula con el margen.
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/ProductoEntrada' } } }
+      responses:
+        '201':
+          description: Producto creado
+          content: { application/json: { schema: { $ref: '#/components/schemas/Producto' } } }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '409': { $ref: '#/components/responses/Conflicto' }
+        '422': { $ref: '#/components/responses/ReglaNegocio' }
+
+  /api/productos/exportar:
+    get:
+      tags: [Productos]
+      summary: Exportar el inventario a CSV
+      responses:
+        '200':
+          description: Archivo CSV (separador punto y coma)
+          content: { text/csv: { schema: { type: string } } }
+
+  /api/productos/importar:
+    post:
+      tags: [Productos]
+      summary: Importar productos desde filas de un CSV (administrador)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                productos:
+                  type: array
+                  items:
+                    allOf:
+                      - $ref: '#/components/schemas/ProductoEntrada'
+                      - type: object
+                        properties: { categoria: { type: string, example: Cárnicos } }
+      responses:
+        '201':
+          description: Resultado de la importación
+          content:
+            application/json:
+              example: { creados: 3, errores: [{ fila: 5, codigo: CHO-001, mensaje: Ya existe un producto con el código CHO-001 }] }
+
+  /api/productos/{id}:
+    get:
+      tags: [Productos]
+      summary: Detalle del producto con sus lotes disponibles
+      parameters: [{ $ref: '#/components/parameters/Id' }]
+      responses:
+        '200': { description: Producto con lotes }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+    put:
+      tags: [Productos]
+      summary: Editar producto (administrador). El cambio de precio queda auditado.
+      parameters: [{ $ref: '#/components/parameters/Id' }]
+      requestBody:
+        content: { application/json: { schema: { $ref: '#/components/schemas/ProductoEntrada' } } }
+      responses:
+        '200': { description: Producto actualizado }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+    delete:
+      tags: [Productos]
+      summary: Desactivar producto (borrado lógico, administrador)
+      parameters: [{ $ref: '#/components/parameters/Id' }]
+      responses:
+        '204': { description: Producto desactivado }
+
+  /api/inventario/entradas:
+    post:
+      tags: [Inventario]
+      summary: Registrar entrada de mercancía (crea un lote)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [producto_id, cantidad]
+              properties:
+                producto_id: { type: integer, example: 3 }
+                proveedor_id: { type: integer, example: 2 }
+                cantidad: { type: integer, example: 20 }
+                costo_unitario: { type: integer, example: 6500 }
+                fecha_vencimiento: { type: string, format: date, example: '2026-12-20' }
+                codigo_lote: { type: string }
+      responses:
+        '201': { description: Lote creado }
+        '422': { $ref: '#/components/responses/ReglaNegocio' }
+
+  /api/inventario/ajustes:
+    post:
+      tags: [Inventario]
+      summary: Registrar ajuste de inventario (merma, vencimiento, avería, conteo)
+      description: Cantidad negativa = salida (FEFO si no se indica lote). Cantidad positiva requiere lote_id.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [producto_id, cantidad, motivo]
+              properties:
+                producto_id: { type: integer }
+                lote_id: { type: integer }
+                cantidad: { type: integer, example: -2 }
+                motivo: { type: string, enum: [merma, vencimiento, averia, conteo, otro] }
+                observacion: { type: string }
+      responses:
+        '201': { description: Ajuste aplicado }
+        '422': { $ref: '#/components/responses/ReglaNegocio' }
+
+  /api/inventario/alertas:
+    get:
+      tags: [Inventario]
+      summary: Bajo stock, lotes por vencer y lotes vencidos
+      parameters:
+        - { name: dias, in: query, schema: { type: integer, default: 7 }, description: Ventana de días para "por vencer" }
+      responses:
+        '200': { description: Alertas de inventario }
+
+  /api/inventario/lotes:
+    get:
+      tags: [Inventario]
+      summary: Listar lotes (orden FEFO)
+      parameters:
+        - { name: producto_id, in: query, schema: { type: integer } }
+        - { name: disponibles, in: query, schema: { type: boolean, default: true } }
+        - { $ref: '#/components/parameters/Pagina' }
+      responses:
+        '200': { description: Página de lotes }
+
+  /api/inventario/movimientos:
+    get:
+      tags: [Inventario]
+      summary: Kardex de movimientos de inventario
+      parameters:
+        - { name: producto_id, in: query, schema: { type: integer } }
+        - { name: tipo, in: query, schema: { type: string, enum: [entrada, venta, ajuste, anulacion] } }
+        - { $ref: '#/components/parameters/Pagina' }
+      responses:
+        '200': { description: Página de movimientos }
+
+  /api/ventas:
+    get:
+      tags: [Ventas]
+      summary: Historial de ventas con filtros e indicadores del período
+      parameters:
+        - { name: desde, in: query, schema: { type: string, format: date } }
+        - { name: hasta, in: query, schema: { type: string, format: date } }
+        - { name: estado, in: query, schema: { type: string, enum: [pagada, pendiente, anulada] } }
+        - { name: cliente_id, in: query, schema: { type: integer } }
+        - { name: buscar, in: query, schema: { type: string }, description: 'Consecutivo, cliente o producto' }
+        - { $ref: '#/components/parameters/Pagina' }
+        - { $ref: '#/components/parameters/Limite' }
+      responses:
+        '200': { description: Página de ventas con meta.resumen }
+    post:
+      tags: [Ventas]
+      summary: Registrar venta. Descuenta inventario por lotes (FEFO) en una transacción.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [medio_pago, items]
+              properties:
+                cliente_id: { type: integer, nullable: true, example: 1 }
+                medio_pago: { type: string, enum: [efectivo, transferencia, tarjeta, credito] }
+                abono_inicial: { type: integer, description: Solo para crédito }
+                observacion: { type: string }
+                items:
+                  type: array
+                  items:
+                    type: object
+                    required: [producto_id, cantidad]
+                    properties: { producto_id: { type: integer, example: 5 }, cantidad: { type: integer, example: 2 } }
+      responses:
+        '201':
+          description: Venta registrada
+          content: { application/json: { schema: { $ref: '#/components/schemas/Venta' } } }
+        '400': { $ref: '#/components/responses/Validacion' }
+        '409':
+          description: Stock insuficiente (se informa cada producto)
+          content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+        '422': { $ref: '#/components/responses/ReglaNegocio' }
+
+  /api/ventas/{id}:
+    get:
+      tags: [Ventas]
+      summary: Detalle de la venta (ítems, abonos y lotes afectados)
+      parameters: [{ $ref: '#/components/parameters/Id' }]
+      responses:
+        '200':
+          description: Venta
+          content: { application/json: { schema: { $ref: '#/components/schemas/Venta' } } }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+
+  /api/ventas/{id}/anular:
+    patch:
+      tags: [Ventas]
+      summary: Anular venta y reintegrar el inventario a sus lotes (administrador)
+      parameters: [{ $ref: '#/components/parameters/Id' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object, required: [motivo], properties: { motivo: { type: string, minLength: 5 } } }
+      responses:
+        '200': { description: Venta anulada }
+        '409': { $ref: '#/components/responses/Conflicto' }
+
+  /api/ventas/{id}/abonos:
+    post:
+      tags: [Ventas]
+      summary: Registrar abono a una venta a crédito
+      parameters: [{ $ref: '#/components/parameters/Id' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [valor]
+              properties:
+                valor: { type: integer, example: 10000 }
+                medio_pago: { type: string, enum: [efectivo, transferencia, tarjeta] }
+      responses:
+        '201': { description: Abono registrado; si el saldo llega a cero la venta queda pagada }
+        '422': { $ref: '#/components/responses/ReglaNegocio' }
+
+  /api/clientes:
+    get:
+      tags: [Clientes]
+      summary: Listar clientes con compras, total comprado y saldo
+      parameters:
+        - { name: buscar, in: query, schema: { type: string } }
+        - { name: con_saldo, in: query, schema: { type: boolean } }
+        - { $ref: '#/components/parameters/Pagina' }
+      responses:
+        '200': { description: Página de clientes }
+    post:
+      tags: [Clientes]
+      summary: Registrar cliente (requiere indicar la autorización de datos)
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/ClienteEntrada' } } }
+      responses:
+        '201': { description: Cliente creado }
+        '400': { $ref: '#/components/responses/Validacion' }
+
+  /api/clientes/{id}:
+    get:
+      tags: [Clientes]
+      summary: Ficha del cliente con historial de compras
+      parameters: [{ $ref: '#/components/parameters/Id' }]
+      responses:
+        '200': { description: Cliente }
+        '404': { $ref: '#/components/responses/NoEncontrado' }
+    put:
+      tags: [Clientes]
+      summary: Editar cliente
+      parameters: [{ $ref: '#/components/parameters/Id' }]
+      requestBody:
+        content: { application/json: { schema: { $ref: '#/components/schemas/ClienteEntrada' } } }
+      responses:
+        '200': { description: Cliente actualizado }
+    delete:
+      tags: [Clientes]
+      summary: Desactivar cliente sin saldo pendiente (administrador)
+      parameters: [{ $ref: '#/components/parameters/Id' }]
+      responses:
+        '204': { description: Cliente desactivado }
+        '422': { $ref: '#/components/responses/ReglaNegocio' }
+
+  /api/dashboard/resumen:
+    get:
+      tags: [Panel]
+      summary: Indicadores del día, bajo stock y ventas recientes
+      responses:
+        '200': { description: Resumen del panel }
+
+  /api/dashboard/ventas:
+    get:
+      tags: [Panel]
+      summary: Serie de ventas para el gráfico
+      parameters:
+        - { name: periodo, in: query, schema: { type: string, enum: [7d, 30d, 90d], default: 7d } }
+      responses:
+        '200':
+          description: Serie
+          content:
+            application/json:
+              example: { periodo: 7d, etiquetas: ['20 nov', '21 nov', Hoy], valores: [320000, 410000, 285000], total: 1015000 }
+
+  /api/reportes/ventas:
+    get:
+      tags: [Reportes]
+      summary: Reporte de ventas por período (JSON o CSV, administrador)
+      parameters:
+        - { name: desde, in: query, schema: { type: string, format: date } }
+        - { name: hasta, in: query, schema: { type: string, format: date } }
+        - { name: formato, in: query, schema: { type: string, enum: [json, csv], default: json } }
+      responses:
+        '200': { description: Reporte }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+
+  /api/auditoria:
+    get:
+      tags: [Auditoría]
+      summary: Bitácora de operaciones críticas (administrador)
+      parameters:
+        - { name: entidad, in: query, schema: { type: string } }
+        - { $ref: '#/components/parameters/Pagina' }
+      responses:
+        '200': { description: Página de registros de auditoría }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    Id: { name: id, in: path, required: true, schema: { type: integer, minimum: 1 } }
+    Pagina: { name: pagina, in: query, schema: { type: integer, minimum: 1, default: 1 } }
+    Limite: { name: limite, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
+  responses:
+    Validacion:
+      description: Datos inválidos
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+          example: { error: { codigo: VALIDACION, mensaje: Los datos enviados no son válidos, detalles: [{ campo: precio_compra, mensaje: Debe ser mayor que cero }], solicitud: 3f1c… } }
+    NoAutenticado:
+      description: Falta el token o expiró
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+    SinPermiso:
+      description: El rol del usuario no permite la operación
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+    NoEncontrado:
+      description: Recurso no encontrado
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+    Conflicto:
+      description: Conflicto con el estado actual (duplicado, ya anulada, etc.)
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+    ReglaNegocio:
+      description: Se incumple una regla de negocio
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            codigo: { type: string, example: STOCK_INSUFICIENTE }
+            mensaje: { type: string }
+            detalles: { type: array, items: { type: object } }
+            solicitud: { type: string, description: Identificador para rastrear el error en los registros }
+    Meta:
+      type: object
+      properties:
+        total: { type: integer }
+        pagina: { type: integer }
+        limite: { type: integer }
+        paginas: { type: integer }
+    Usuario:
+      type: object
+      properties:
+        id: { type: integer }
+        nombre: { type: string }
+        usuario: { type: string }
+        correo: { type: string }
+        rol: { type: string, enum: [admin, vendedor] }
+        activo: { type: boolean }
+    Producto:
+      type: object
+      properties:
+        id: { type: integer }
+        codigo: { type: string, example: QSO-014 }
+        nombre: { type: string, example: Queso campesino }
+        categoria: { type: string }
+        presentacion: { type: string }
+        unidad: { type: string }
+        precio_compra: { type: integer }
+        margen: { type: number }
+        precio_venta: { type: integer }
+        stock: { type: integer }
+        stock_minimo: { type: integer }
+        bajo_stock: { type: boolean }
+        proximo_vencimiento: { type: string, format: date, nullable: true }
+        activo: { type: boolean }
+    ProductoEntrada:
+      type: object
+      required: [codigo, nombre, categoria_id, presentacion, precio_compra]
+      properties:
+        codigo: { type: string, example: CHO-010 }
+        nombre: { type: string, example: Chorizo de ternera }
+        categoria_id: { type: integer, example: 1 }
+        proveedor_id: { type: integer, example: 1 }
+        presentacion: { type: string, example: Paquete x 500 g }
+        unidad: { type: string, enum: [unidad, paquete, libra, kilo, botella, bolsa] }
+        precio_compra: { type: integer, example: 4500 }
+        margen: { type: number, example: 35 }
+        precio_venta: { type: integer, description: Opcional; si se omite se calcula }
+        stock_minimo: { type: integer, example: 5 }
+        stock_inicial: { type: integer, example: 10 }
+        fecha_vencimiento: { type: string, format: date }
+        descripcion: { type: string }
+    ProveedorEntrada:
+      type: object
+      required: [nit, razon_social]
+      properties:
+        nit: { type: string, example: 900123456-1 }
+        razon_social: { type: string }
+        contacto: { type: string }
+        telefono: { type: string }
+        correo: { type: string, format: email }
+        direccion: { type: string }
+    ClienteEntrada:
+      type: object
+      required: [nombre, autoriza_datos]
+      properties:
+        documento: { type: string }
+        nombre: { type: string }
+        telefono: { type: string }
+        correo: { type: string, format: email }
+        direccion: { type: string }
+        autoriza_datos: { type: boolean, description: Autorización de tratamiento de datos (Ley 1581 de 2012) }
+    Venta:
+      type: object
+      properties:
+        id: { type: integer }
+        consecutivo: { type: string, example: V-0451 }
+        fecha: { type: string, format: date }
+        hora: { type: string, example: '10:42' }
+        cliente: { type: string, nullable: true }
+        vendedor: { type: string }
+        medio_pago: { type: string }
+        estado: { type: string, enum: [pagada, pendiente, anulada] }
+        total: { type: integer }
+        saldo: { type: integer }
+        items:
+          type: array
+          items:
+            type: object
+            properties: { producto: { type: string }, cantidad: { type: integer }, precio_unitario: { type: integer }, subtotal: { type: integer } }
