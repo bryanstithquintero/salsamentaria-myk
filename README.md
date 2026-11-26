@@ -67,5 +67,3 @@ cd frontend && npm test    # 13 pruebas (Vitest + Testing Library)
 - Clientes con historial y saldo; proveedores con sus entradas.
 - Reportes por período (productos, medios de pago, categorías, vendedores) en CSV o PDF.
 - Gestión de usuarios y bitácora de auditoría.
-
-Guía de despliegue paso a paso: [documentacion/DESPLIEGUE.md](documentacion/DESPLIEGUE.md).
