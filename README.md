@@ -11,8 +11,8 @@ Autor: **Bryan Stith Quintero Guacary**.
 | | URL |
 |---|---|
 | Aplicación (GitHub Pages) | https://bryanstithquintero.github.io/salsamentaria-myk/ |
-| API REST (Render) | https://myk-api.onrender.com/api/health |
-| Documentación Swagger | https://myk-api.onrender.com/api/docs |
+| API REST (Render) | https://myk-api-8twu.onrender.com/api/health |
+| Documentación Swagger | https://myk-api-8twu.onrender.com/api/docs |
 | Versión 1 (HTML/CSS/JS) | https://bryanstithquintero.github.io/salsamentaria-myk/v1/ |
 
 > El servidor gratuito de Render se suspende tras 15 minutos sin uso: la primera carga puede tardar cerca de un minuto.

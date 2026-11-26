@@ -19,9 +19,9 @@ La aplicación se publica en tres servicios gratuitos:
 1. Entrar a https://render.com e iniciar sesión con GitHub.
 2. **New → Blueprint** y elegir el repositorio `salsamentaria-myk` (Render lee `render.yaml`).
 3. Cuando pida `DATABASE_URL`, pegar la cadena de Neon.
-4. Esperar el despliegue. La API queda en `https://myk-api.onrender.com`.
+4. Esperar el despliegue. La API queda en `https://myk-api-8twu.onrender.com`.
    Al iniciar, la API crea las tablas y carga los datos de demostración automáticamente.
-5. Verificar: `https://myk-api.onrender.com/api/health` debe responder `{"estado":"ok"}`.
+5. Verificar: `https://myk-api-8twu.onrender.com/api/health` debe responder `{"estado":"ok"}`.
 
 > Si Render asigna otra URL (por ejemplo `myk-api-xxxx.onrender.com`), cámbiela en
 > `frontend/src/api/cliente.js` y vuelva a publicar el frontend.

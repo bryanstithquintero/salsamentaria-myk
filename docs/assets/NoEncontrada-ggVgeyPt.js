@@ -1,1 +1,0 @@
-import{r as e,t}from"./react-BsiLFB-Z.js";import{f as n}from"./index-BWavDPp6.js";var r=t();function i(){return(0,r.jsx)(n,{titulo:`Página no encontrada`,texto:`La dirección no existe o fue movida.`,icono:`alerta`,children:(0,r.jsx)(e,{to:`/`,className:`btn btn-primary btn-sm`,children:`Volver al panel`})})}export{i as default};
