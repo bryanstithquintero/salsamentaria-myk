@@ -13,3 +13,6 @@ dist/
 # Sistema
 .DS_Store
 Thumbs.db
+
+# archivos
+documentacion/DESPLIEGUE.md
