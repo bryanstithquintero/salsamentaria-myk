@@ -9,7 +9,7 @@ import axios from 'axios';
 // En desarrollo apunta a la API local; en producción, a la API publicada en Render.
 // Se puede cambiar con la variable de entorno VITE_API_URL (archivo .env.local).
 export const API_URL = import.meta.env.VITE_API_URL
-  || (import.meta.env.PROD ? 'https://myk-api.onrender.com/api' : 'http://localhost:4000/api');
+  || (import.meta.env.PROD ? 'https://myk-api-8twu.onrender.com/api' : 'http://localhost:4000/api');
 const CLAVE_TOKEN = 'myk_token';
 
 export const almacenToken = {
